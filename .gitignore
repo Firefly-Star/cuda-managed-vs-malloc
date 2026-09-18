@@ -1,0 +1,33 @@
+# ---- 编译产物 ----
+# 每个 .cu 编译出的同名可执行文件（见 Makefile），make clean 可删
+bwbench
+devquery
+ladder
+memloc_test
+occupancy_test
+pagefault_test
+pcie_bw
+readcache
+residency
+um_model
+
+# 目标文件 / 中间产物
+*.o
+*.obj
+*.gpu
+*.ptx
+*.cubin
+*.fatbin
+
+# ---- Nsight 输出 ----
+*.nsys-rep
+*.ncu-rep
+*.sqlite
+*.qdstrm
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

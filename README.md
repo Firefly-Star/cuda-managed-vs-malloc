@@ -1,5 +1,21 @@
 # cuda-managed-vs-malloc
 
+**On Windows-family platforms, `cudaMallocManaged` memory never becomes resident in VRAM.**
+
+> A set of controlled experiments, starting from "I followed NVIDIA's *Even Easier
+> Introduction to CUDA*, computed the bandwidth by hand, and the number didn't add up."
+
+Ten standalone `.cu` programs, each one testing a single competing hypothesis: page-fault
+overhead, occupancy, memory residency, on-demand vs. bulk migration, L2 caching across PCIe,
+and PCIe link saturation. Verdict: managed memory reads at a constant **9.9 GB/s** (98.6% of
+the measured PCIe ceiling) versus **131 GB/s** for `cudaMalloc` + `cudaMemcpy` — a **13× gap** —
+because the data is never actually migrated. All absolute numbers depend on hardware; only
+the ratios are meaningful.
+
+The body of this README is in Chinese.
+
+---
+
 `cudaMallocManaged` 与 `cudaMalloc` + `cudaMemcpy` 的实测对比程序。
 
 > 起因是照着 NVIDIA 的 [Even Easier Introduction to CUDA](https://developer.nvidia.com/blog/even-easier-introduction-cuda/) 做练习，顺手算了下带宽，发现数字对不上，往下挖出的一串实验。
@@ -103,6 +119,12 @@ N            流量     managed        cudaMalloc     倍数
 
 ---
 
-## 一句话结论
+## 相关
 
-在 Windows 系平台上，`cudaMallocManaged` 的数据永远不会进显存，每次访存都要跨 PCIe 回主机内存取。实测带宽恒为 ~9.9 GB/s，而 `cudaMalloc` + `cudaMemcpy` 能跑到 ~131 GB/s —— **13 倍差距**。所以：**用显式内存管理。**
+- [`cuda-bench`](https://github.com/Firefly-Star/cuda-bench) —— 这套实验用的抖动判据
+  `(p95-min)/min`、绑核、计时窗口约定都来自这里
+- `cuda-execution-model`、`cuda-benchmark-warmup` —— 同一脉络下的其他对照实验
+
+## License
+
+[MIT](LICENSE)
